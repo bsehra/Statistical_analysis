@@ -2,6 +2,7 @@
 
 """Program to process scoring data"""
 #Written by Bhupinder Sehra; created 8/29/16
+#Updated 6/1/17
 
 import sys
 import os
@@ -10,6 +11,15 @@ import numpy as np
 import itertools
 import openpyxl
 import collections
+
+"""
+xfin = Excel workbook input with scoring data 
+sheetin = worksheet name with data to process
+devstagenum = number of developmental stages across which expression was analysed
+xfout = Excel workbook to write out average scores
+xsheetout = worksheet to write data output
+newwb = 'y' for yes if data to be written to a new workbook; 'n' for writing out data to the same workbook as input
+"""
 
 xfin = sys.argv[1]
 sheetin = str(sys.argv[2])
