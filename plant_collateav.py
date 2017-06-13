@@ -1,7 +1,8 @@
 #!usr/bin/env python
 
-"""Program to process scoring data"""
+"""Program to produce average scores across sibling lines from data obtained by analysing expression of YFP in transgenic lines"""
 #Written by Bhupinder Sehra; created 8/29/16
+#Updated 6/1/17
 
 import sys
 import os
@@ -11,6 +12,15 @@ import itertools
 import openpyxl
 import collections
 
+"""
+xfin = Excel workbook input with scoring data 
+sheetin = worksheet name with data to process
+devstagenum = number of developmental stages across which expression was analysed
+xfout = Excel workbook to write out average scores
+xsheetout = worksheet to write data output
+newwb = 'y' for yes if data to be written to a new workbook; 'n' for writing out data to the same workbook as input
+"""
+
 xfin = sys.argv[1]
 sheetin = str(sys.argv[2])
 devstagenum = sys.argv[3]
@@ -18,12 +28,12 @@ xfout = sys.argv[4]
 xsheetout = sys.argv[5]
 newwb = str(sys.argv[6])
 
-#numtissues = sys.argv[4]
-
 def getcol(matrix, i):
+    """Returns a column from a 2D array"""
     return [row[i] for row in matrix]
 
 def getavscores(devstagelist, onesiblist, stagecolnum):
+    """Returns 
     avscorelist = [] #will contain average scores                                                                                                                                                                     
     templ = []
     collate = []
@@ -63,7 +73,6 @@ def getavscores(devstagelist, onesiblist, stagecolnum):
     return newlist
 
 #declaring variables
-df = {}
 df2 = {}
 sorteddf = {}
 stagelist = []
@@ -89,10 +98,11 @@ df2 = df.get(sheetin)
 #print df2
 tempdf = {}
 
+"""Main method"""
 for i in range(0, int(devstagenum)):  
     stagelist.append(str(df2.iloc[i, 2]))
 tissues = df2.columns.values.tolist()
-print "This is tissues", tissues
+print "These are the tissues assayed", tissues
 setsib = set(df2.iloc[:, 1].values.tolist())
 setsib = set(filter(lambda x: x == x , setsib))
 temp =[]
@@ -106,48 +116,24 @@ for sib in setsib:
            if row[2] == sib:
                sibrows.append(list(row)[1:])
        except:
-           print "what you have cannot be converted to float"
-   #print len(sibrows), "This is the length of sibrows"   
-   if len(sibrows) == 7:
+           print "What you have cannot be converted to a float value."  
+   if len(sibrows) == int(devstagenum):
        tempdf = pd.DataFrame(data=sibrows, columns=tissues)
        tempdf.set_value(0, 'line', sib)
-       print "This is tempdf for sibs with only 1 plant", tempdf
-       #sibrows = []
-       #dfx = tempdf.loc[:,0]
-       #allsibav.append(tempdf)
-   if len(sibrows) > 7:
+       print "These are the scores for lines with only sibling assayed", tempdf     
+   if len(sibrows) > int(devstagenum):
        print "yes more than 7", sibrows
        sibav = getavscores(stagelist, sibrows, 2)
        tempdf = pd.DataFrame(data=sibav, columns=tissues)
        tempdf.set_value(0, 'line', sib)
-       print "This is tempdf for sibs with > 1 plant", tempdf
+       print "These are the scores for lines with > 1 plant", tempdf
    allsibav.append(tempdf)
    sibrows = []
    print len(allsibav), "This is len of allsibav"
-#print setsib
 
-#print allsibav, "This is allsibav"
-#print allsibsplusav, "this is the latest allsibsplusav"
 sorteddf = pd.concat(allsibav, ignore_index=False)
-#sorteddf = sorteddf.ix[:,1:]
 
-#concatdf = pd.DataFrame(data=dataout, columns=tissues)
-#sorteddf = pd.concat(allsibsplusav, keys=)
-#print sorteddf, "this is sorteddf" #write out to Excel
-
-#concatdft.to_excel('test.xlsx', sheet_name='2082_2081_1kbpSHP2_counts')
-#concatdf.transpose().to_excel(xfout, sheet_name=xsheetout)
-
-"""
-from openpyxl import load_workbook
-book = load_workbook(xfout)
-writer = pd.ExcelWriter(xfout, engine='openpyxl') 
-writer.book = book
-writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-sorteddf.to_excel(writer, xsheetout)
-writer.save()
-"""
-
+"""Write out to Excel Workbook (.xlsx)"""
 if newwb == 'n':
     from openpyxl import load_workbook
     book = load_workbook(xfout)
