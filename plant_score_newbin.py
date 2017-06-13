@@ -21,9 +21,11 @@ newwb = str(sys.argv[6])
 #numtissues = sys.argv[4]
 
 def getcol(matrix, i):
+    """Return a column from a 2d array"""
     return [row[i] for row in matrix]
 
 def bin_count(sclist, fineq1, fineq2):
+    """Sorts an input list of values and returns a value corresponding to a bin"""
     if fineq1 == 0.0 and fineq2 == 0.0:
         return sum(1 for x in sclist if float(x) == fineq1)
     if fineq1 == 0.0 and fineq2 > 0.0:
@@ -32,10 +34,10 @@ def bin_count(sclist, fineq1, fineq2):
         return sum(1 for x in sclist if float(x) > fineq1  and float(x) <= fineq2)
 
 def make_float(listnum):
+    """Return float value from input element (normally int)"""
     return [float(element) for element in listnum]
 
 #read in all sheets as dict
-
 #declaring variables
 df = {}
 df2 = {}
@@ -56,6 +58,7 @@ scoredict = {}
 numrows= 0
 numcols = 0
 
+"""Main method"""
 df = pd.read_excel(xfin, sheetname=None)
 df2 = df.get(sheetin)
 df2 = df2.drop("Style_ap_ring_(y/n)",  1)
@@ -84,7 +87,6 @@ for s in stagelist:
             #print "This is currcol", currcol
         except:
             print "This list is full of strings"
-            #print currcol
        #perform count function over this and all following rows. Count is a list.
        #index 0 (i <1); [1] (1<=n <2) etc all the way up to 5
         count.append(bin_count(currcol, float(0.0), float(0.0)))
@@ -94,35 +96,15 @@ for s in stagelist:
         count.append(bin_count(currcol, float(3.0), float(4.0)))
         count.append(bin_count(currcol, float(4.0), float(5.0)))
         #5 scores gen/tissue
-        #print tuple(count), "this is tuple(count)"
         tissuecount.append(count)
-        #print tissuecount
         nptissuecount=np.array(tissuecount)
-        #print "This is the length of count", len(count)
-        #print "This is the length of nptissuecount", len(nptissuecount)
-        #print tissuecount
         count = []
-    #stagecount.append(tissuecount)
-    #print nptissuecount
-    #print [row[0] for row in tissuecount], "this is row in tissuecount"
     scoredict[s] = [tissuecount]
     tissuecount = []
-    #scoredict[s] = [stagecount]
-    #stagecount = []
-    #print [row for row in scoredict.get(s)], "this is tissuecount"
-    #print [row[0] for row in scoredict.get(s)], "this is [0] in tissuecount"
-    #print [row[0][0] for row in scoredict.get(s)], "this is [0][0] in tissuecount"
 #Create dataframe of counts to write out to excel file
 dataout = [] 
 dataflist = []
-"""
-from itertools import repeat
-multistage = []
-multistage = [x for item in stagelist for x in repeat(item, len(bins))]
-print multistage
-multibins = bins*5
-print multibins
-"""
+
 for stage in stagelist:
     dataout = (scoredict.get(stage)[0])
     print stage
@@ -139,11 +121,8 @@ for stage in stagelist:
     dataflist.append(countdf2)
 concatdf = pd.concat(dataflist, keys=stagelist)
 print concatdf
-#concatdft.to_excel('test.xlsx', sheet_name='2082_2081_1kbpSHP2_counts')
-#concatdf.transpose().to_excel(xfout, sheet_name=xsheetout)
 
-
-#write out to Excel
+#write out to Excel workbook
 if newwb == 'n':
     from openpyxl import load_workbook
     book = load_workbook(xfout)
