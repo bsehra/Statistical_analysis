@@ -73,32 +73,25 @@ def getavscores(devstagelist, onesiblist, stagecolnum):
     return newlist
 
 #declaring variables
+df = {}
 df2 = {}
+tempdf = {}
 sorteddf = {}
 stagelist = []
-labels = []
-vsetsib = []
 usiblist = []
 sibrows = []
 scorerows = []
 finalrows = []
-rcol = []
-count = []
 tissues=[]
 stagecount = []
-nptissuecount = []
-sctrans = []
-sctlen = 0
-numrows= 0
-numcols = 0
 sibav =[]
 allsibav = []
-df = pd.read_excel(xfin, sheetname=None)
-df2 = df.get(sheetin)
-#print df2
-tempdf = {}
+
 
 """Main method"""
+#read in all of the sheets within the input Excel workbook
+df = pd.read_excel(xfin, sheetname=None)
+df2 = df.get(sheetin)
 for i in range(0, int(devstagenum)):  
     stagelist.append(str(df2.iloc[i, 2]))
 tissues = df2.columns.values.tolist()
@@ -122,7 +115,7 @@ for sib in setsib:
        tempdf.set_value(0, 'line', sib)
        print "These are the scores for lines with only sibling assayed", tempdf     
    if len(sibrows) > int(devstagenum):
-       print "yes more than 7", sibrows
+       print "yes more than", str(devstagenum), sibrows
        sibav = getavscores(stagelist, sibrows, 2)
        tempdf = pd.DataFrame(data=sibav, columns=tissues)
        tempdf.set_value(0, 'line', sib)
